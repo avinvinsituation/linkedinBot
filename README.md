@@ -1,4 +1,4 @@
 # linkedinBot
 Bot that visits user profiles.
 
-Visit avinvinsituation.com for more!
+Website: avinvinsituation.com

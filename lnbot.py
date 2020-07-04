@@ -1,8 +1,9 @@
+import os
+import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-import time
+
 random_time = lambda: (int(int(round(time.time()*10000))%10)/2)
-import os
 
 class Bot():
     def __init__(self):
@@ -27,5 +28,27 @@ class Bot():
         signin_button.click()
         time.sleep(5)
 
+    def search_keyword(self,keywords):
+        search_box = self.driver.find_element_by_xpath("//input[@placeholder='Search']")
+        search_box.click()
+        search_box.send_keys(keywords)
+        search_box.send_keys(Keys.ENTER)
+        time.sleep(2)
+        self.scroll_entire_page()
+
+    def scroll_entire_page(self):
+        body = self.driver.find_element_by_css_selector('body')
+        for i in range(20):
+            body.send_keys(Keys.PAGE_DOWN)
+            time.sleep(0.1)
+        body.send_keys(Keys.END)
+        time.sleep(1)
+        for i in range(20):
+            body.send_keys(Keys.PAGE_UP)
+            time.sleep(0.1)
+        body.send_keys(Keys.HOME)
+        time.sleep(0.1)
+
 visiting_bot = Bot()
 visiting_bot.login_linkedin(os.getenv('EMAIL'),os.getenv('EMAIL_PASSWD'))
+visiting_bot.search_keyword("We're hiring")

@@ -2,6 +2,7 @@ import os
 import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 
 random_time = lambda: (int(int(round(time.time()*10000))%10)/2)
 
@@ -49,6 +50,29 @@ class Bot():
         body.send_keys(Keys.HOME)
         time.sleep(0.1)
 
+    def visit_every_search_result(self):
+        self.open_profiles_in_new_tab()
+        result_window = self.driver.current_window_handle
+        open_window_handles = self.driver.window_handles
+        for window in open_window_handles:
+            self.driver.switch_to.window(window)
+            if self.driver.current_window_handle != result_window:
+                self.scroll_entire_page()
+                time.sleep(1)
+                visiting_bot.closeBrowser()
+                time.sleep(1)
+
+    def open_profiles_in_new_tab(self):
+        self.scroll_entire_page()
+        result_items = []
+        result_items = self.driver.find_elements_by_xpath("//figure[@class='search-result__image']")
+        for profile in result_items:
+            ActionChains(self.driver).key_down(Keys.CONTROL).click(profile).key_up(Keys.CONTROL).perform()
+            time.sleep(2)
+
+
+
 visiting_bot = Bot()
 visiting_bot.login_linkedin(os.getenv('EMAIL'),os.getenv('EMAIL_PASSWD'))
 visiting_bot.search_keyword("We're hiring")
+visiting_bot.visit_every_search_result()

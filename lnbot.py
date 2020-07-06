@@ -50,8 +50,31 @@ class Bot():
         body.send_keys(Keys.HOME)
         time.sleep(0.1)
 
-    def visit_every_search_result(self):
-        self.open_profiles_in_new_tab()
+    def visit_every_search_result(self,number_of_pages_to_visit=2):
+        next_page = True
+        while(next_page and (number_of_pages_to_visit >= 0)):
+            number_of_pages_to_visit -= 1
+            self.open_profiles_in_new_tabs()
+            self.visit_and_scroll_all_tabs()
+            try:
+                next_page_button = self.driver.find_elements_by_xpath("//button[@aria-label='Next']")
+                next_page_button.click()
+                next_page = True
+            except Exception as e:
+                if number_of_pages_to_visit>0:
+                    print("Number of results are lesser than the number of pages.")
+                    print(f"Number of pages visited : {number_of_pages_to_visit}")
+                next_page = False
+
+    def open_profiles_in_new_tabs(self):
+        self.scroll_entire_page()
+        result_items = []
+        result_items = self.driver.find_elements_by_xpath("//figure[@class='search-result__image']")
+        for profile in result_items:
+            ActionChains(self.driver).key_down(Keys.CONTROL).click(profile).key_up(Keys.CONTROL).perform()
+            time.sleep(2)
+
+    def visit_and_scroll_all_tabs(self):
         result_window = self.driver.current_window_handle
         open_window_handles = self.driver.window_handles
         for window in open_window_handles:
@@ -61,16 +84,7 @@ class Bot():
                 time.sleep(1)
                 visiting_bot.closeBrowser()
                 time.sleep(1)
-
-    def open_profiles_in_new_tab(self):
-        self.scroll_entire_page()
-        result_items = []
-        result_items = self.driver.find_elements_by_xpath("//figure[@class='search-result__image']")
-        for profile in result_items:
-            ActionChains(self.driver).key_down(Keys.CONTROL).click(profile).key_up(Keys.CONTROL).perform()
-            time.sleep(2)
-
-
+        self.driver.switch_to.window(self.driver.window_handles[0])
 
 visiting_bot = Bot()
 visiting_bot.login_linkedin(os.getenv('EMAIL'),os.getenv('EMAIL_PASSWD'))
